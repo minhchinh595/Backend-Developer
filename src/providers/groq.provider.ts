@@ -128,7 +128,7 @@ export interface StructuredAIResponse {
 
 export async function generateStructuredCompletion(
   messages: ChatMessage[]
-): Promise<StructuredAIResponse> {
+) {
   const completion = await groq.chat.completions.create({
     model: "openai/gpt-oss-120b",
     messages,
@@ -165,5 +165,9 @@ export async function generateStructuredCompletion(
     );
   }
 
-  return parsed as StructuredAIResponse;
+  return {
+    data: parsed as StructuredAIResponse,
+    model: completion.model,
+    usage: completion.usage,
+  };
 }

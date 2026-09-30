@@ -41,17 +41,19 @@ Do not include any text outside the JSON object.
     const latencyMs = Date.now() - startTime;
 
     await prisma.aIRequest.create({
-      data: {
+    data: {
         userId,
-        model: "openai/gpt-oss-120b",
+        model: result.model,
         provider: "groq",
         timestamp: new Date(),
         latencyMs,
+        inputTokens: result.usage?.prompt_tokens ?? null,
+        outputTokens: result.usage?.completion_tokens ?? null,
         status: "SUCCESS",
-      },
+    },
     });
 
-    return result;
+    return result.data;
   } catch (error) {
     const latencyMs = Date.now() - startTime;
 
