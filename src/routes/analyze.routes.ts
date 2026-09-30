@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { chat } from "../controllers/ai.controller.js";
+import { analyze } from "../controllers/analyze.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { aiRateLimiter } from "../middleware/rate-limit.middleware.js";
 
 const router = Router();
 
 router.post(
-  "/chat",
+  "/",
   authenticate,
   aiRateLimiter,
-  chat
+  analyze
 );
 
 export default router;

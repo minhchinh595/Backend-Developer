@@ -119,3 +119,51 @@ export async function generateChatCompletion(
 
   throw lastError;
 }
+
+export interface StructuredAIResponse {
+  answer: string;
+  summary: string;
+  keyPoints: string[];
+}
+
+export async function generateStructuredCompletion(
+  messages: ChatMessage[]
+): Promise<StructuredAIResponse> {
+  const completion = await groq.chat.completions.create({
+    model: "openai/gpt-oss-120b",
+    messages,
+    response_format: {
+      type: "json_object",
+    },
+  });
+
+  const content =
+    completion.choices[0]?.message?.content ?? "";
+
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error(
+      "AI provider returned invalid JSON"
+    );
+  }
+
+  if (
+    typeof parsed !== "object" ||
+    parsed === null ||
+    typeof (parsed as any).answer !== "string" ||
+    typeof (parsed as any).summary !== "string" ||
+    !Array.isArray((parsed as any).keyPoints) ||
+    !(parsed as any).keyPoints.every(
+      (item: unknown) => typeof item === "string"
+    )
+  ) {
+    throw new Error(
+      "AI provider returned invalid structured output"
+    );
+  }
+
+  return parsed as StructuredAIResponse;
+}
