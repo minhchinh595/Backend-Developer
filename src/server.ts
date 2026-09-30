@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js";
 import protectedRoutes from "./routes/protected.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
+import usageRoutes from "./routes/usage.routes.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/usage", usageRoutes);
 
 app.get("/api/health", async (req, res) => {
   try {

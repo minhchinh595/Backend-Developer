@@ -31,11 +31,9 @@ export async function chat(
     return res.status(200).json({
       success: true,
       data: {
-        conversationId: result.conversationId,
         message: result.content,
         model: result.model,
         usage: result.usage,
-        latencyMs: result.latencyMs,
       },
     });
   } catch (error) {
