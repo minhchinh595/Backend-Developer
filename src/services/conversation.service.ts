@@ -17,3 +17,22 @@ export async function getUserConversations(userId: number) {
     },
   });
 }
+
+export async function getConversationById(
+  userId: number,
+  conversationId: number
+) {
+  return prisma.conversation.findFirst({
+    where: {
+      id: conversationId,
+      userId,
+    },
+    include: {
+      messages: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+    },
+  });
+}
