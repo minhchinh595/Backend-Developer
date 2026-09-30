@@ -7,6 +7,13 @@ export async function analyze(
   res: Response
 ) {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
     const { message } = req.body;
 
     if (!message || typeof message !== "string") {
@@ -16,7 +23,10 @@ export async function analyze(
       });
     }
 
-    const result = await analyzeWithAI(message);
+    const result = await analyzeWithAI(
+      req.user.userId,
+      message
+    );
 
     return res.status(200).json({
       success: true,
