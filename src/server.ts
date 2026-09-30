@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { prisma } from "./db.js";
 import authRoutes from "./routes/auth.routes.js";
 import protectedRoutes from "./routes/protected.routes.js";
+import aiRoutes from "./routes/ai.routes.js";
+import conversationRoutes from "./routes/conversation.routes.js";
 
 dotenv.config();
 
@@ -13,6 +15,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 app.get("/api/health", async (req, res) => {
   try {
