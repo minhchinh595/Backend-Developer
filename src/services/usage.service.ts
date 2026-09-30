@@ -34,8 +34,10 @@ export async function getUserUsage(userId: number) {
       : 0;
 
   const failedRequests = requests.filter(
-    (request) => request.status === "FAILED"
-  ).length;
+    (request) =>
+        request.status === "FAILED" ||
+        request.status === "TIMEOUT"
+    ).length;
 
   const errorRate =
     totalRequests > 0

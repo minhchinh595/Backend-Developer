@@ -1,6 +1,7 @@
 import {
   generateChatCompletion,
   ChatMessage,
+  AIProviderTimeoutError,
 } from "../providers/groq.provider.js";
 
 import { prisma } from "../lib/prisma.js";
@@ -44,13 +45,15 @@ export async function chatWithAI(
   } catch (error) {
     const latencyMs = Date.now() - startTime;
 
+    const isTimeout = error instanceof AIProviderTimeoutError;
+
     await prisma.aIRequest.create({
       data: {
         userId,
-        model: process.env.GROQ_MODEL ?? "openai/gpt-oss-120b",
+        model: "openai/gpt-oss-120b",
         provider: "groq",
         latencyMs,
-        status: "FAILED",
+        status: isTimeout ? "TIMEOUT" : "FAILED",
         errorMessage:
           error instanceof Error
             ? error.message

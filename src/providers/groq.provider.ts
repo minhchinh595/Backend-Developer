@@ -15,6 +15,13 @@ export interface ChatMessage {
   content: string;
 }
 
+export class AIProviderTimeoutError extends Error {
+  constructor(message = "AI provider request timed out") {
+    super(message);
+    this.name = "AIProviderTimeoutError";
+  }
+}
+
 // Maximum number of retries after the initial request
 const MAX_RETRIES = 2;
 
@@ -25,6 +32,14 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function isTimeoutError(error: any) {
+  return (
+    error?.name === "TimeoutError" ||
+    error?.code === "ETIMEDOUT" ||
+    error?.code === "ECONNABORTED"
+  );
+}
+
 function isRetryableError(error: any) {
   const status = error?.status;
 
@@ -33,7 +48,8 @@ function isRetryableError(error: any) {
     status === 500 ||
     status === 502 ||
     status === 503 ||
-    status === 504
+    status === 504 ||
+    isTimeoutError(error)
   );
 }
 
@@ -70,6 +86,14 @@ export async function generateChatCompletion(
         `AI provider attempt ${attempt + 1} failed:`,
         error
       );
+
+      // If the provider request timed out,
+      // convert it to our custom timeout error.
+      if (isTimeoutError(error)) {
+        if (attempt === MAX_RETRIES) {
+          throw new AIProviderTimeoutError();
+        }
+      }
 
       // Do not retry permanent errors such as 401 or 404
       if (!isRetryableError(error)) {
